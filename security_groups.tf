@@ -1,17 +1,17 @@
 resource "openstack_networking_secgroup_v2" "mongodb_replicaset_member" {
-  name                 = "mongodb-replicaset-member-${var.namespace}"
+  name                 = "${var.namespace}-mongodb-member"
   description          = "Security group for mongodb replicaset members"
   delete_default_rules = true
 }
 
 resource "openstack_networking_secgroup_v2" "mongodb_client" {
-  name                 = "mongodb-client-${var.namespace}"
+  name                 = "${var.namespace}-mongodb-client"
   description          = "Security group for the clients connecting to mongodb replicaset members"
   delete_default_rules = true
 }
 
 resource "openstack_networking_secgroup_v2" "mongodb_bastion" {
-  name                 = "mongodb-bastion-${var.namespace}"
+  name                 = "${var.namespace}-mongodb-bastion"
   description          = "Security group for the bastion connecting to mongodb replicaset members"
   delete_default_rules = true
 }
