@@ -17,12 +17,12 @@ The **client** security group is meant to supplement other security groups a vm 
 
 The module takes the following variables as input:
 
-- namespace: Namespace to differenciate the security group names across etcd clusters. The generated security groups will have the following names: 
+- **namespace**: Namespace to differenciate the security group names across etcd clusters. The generated security groups will have the following names: 
 
 ```
-mongodb-replicaset-member-<namespace>
-mongodb-client-<namespace>
-mongodb-bastion-<namespace>
+<namespace>-mongodb-member
+<namespace>-mongodb-client
+<namespace>-mongodb-bastion
 ```
 
 ## Output
