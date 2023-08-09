@@ -16,14 +16,13 @@ The **client** security group is meant to supplement other security groups a vm 
 ## Variables
 
 The module takes the following variables as input:
-
-- **namespace**: Namespace to differenciate the security group names across mongodb replicasets. The generated security groups will have the following names: 
-
-```
-<namespace>-mongodb-member
-<namespace>-mongodb-client
-<namespace>-mongodb-bastion
-```
+- **namespace**: Namespace to differenciate the security group names across mongodb replicasets. The generated security groups will have the following names:
+    ```
+    <namespace>-mongodb-member
+    <namespace>-mongodb-client
+    <namespace>-mongodb-bastion
+    ```
+- **bastion_security_group_id**: Id of pre-existing security group to add bastion rules to (defaults to "")
 
 ## Output
 

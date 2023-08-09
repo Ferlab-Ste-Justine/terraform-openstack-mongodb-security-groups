@@ -16,6 +16,10 @@ resource "openstack_networking_secgroup_v2" "mongodb_bastion" {
   delete_default_rules = true
 }
 
+locals {
+  bastion_group_ids = var.bastion_security_group_id != "" ? [var.bastion_security_group_id, openstack_networking_secgroup_v2.mongodb_bastion.id] : [openstack_networking_secgroup_v2.mongodb_bastion.id]
+}
+
 //Allow all outbound traffic from mongodb members and bastion
 resource "openstack_networking_secgroup_rule_v2" "mongodb_replicaset_member_outgoing_v4" {
   direction         = "egress"
@@ -48,18 +52,19 @@ resource "openstack_networking_secgroup_rule_v2" "peer_mongodb_replicaset_access
   protocol          = "tcp"
   port_range_min    = 27017
   port_range_max    = 27017
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
 //Allow port 22 traffic from the bastion
 resource "openstack_networking_secgroup_rule_v2" "internal_ssh_access" {
+  for_each          = { for idx, id in local.bastion_group_ids : idx => id }
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
   port_range_min    = 22
   port_range_max    = 22
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_bastion.id
+  remote_group_id   = each.value
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
@@ -81,7 +86,7 @@ resource "openstack_networking_secgroup_rule_v2" "client_mongodb_access" {
   protocol          = "tcp"
   port_range_min    = 27017
   port_range_max    = 27017
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_client.id
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_client.id
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
@@ -90,7 +95,7 @@ resource "openstack_networking_secgroup_rule_v2" "client_icmp_access_v4" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "icmp"
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_client.id
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_client.id
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
@@ -98,23 +103,25 @@ resource "openstack_networking_secgroup_rule_v2" "client_icmp_access_v6" {
   direction         = "ingress"
   ethertype         = "IPv6"
   protocol          = "ipv6-icmp"
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_client.id
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_client.id
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
 resource "openstack_networking_secgroup_rule_v2" "bastion_icmp_access_v4" {
+  for_each          = { for idx, id in local.bastion_group_ids : idx => id }
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "icmp"
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_bastion.id
+  remote_group_id   = each.value
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
 resource "openstack_networking_secgroup_rule_v2" "bastion_icmp_access_v6" {
+  for_each          = { for idx, id in local.bastion_group_ids : idx => id }
   direction         = "ingress"
   ethertype         = "IPv6"
   protocol          = "ipv6-icmp"
-  remote_group_id  = openstack_networking_secgroup_v2.mongodb_bastion.id
+  remote_group_id   = each.value
   security_group_id = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
 }
 
