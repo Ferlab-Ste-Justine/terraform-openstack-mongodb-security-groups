@@ -9,3 +9,15 @@ variable "bastion_security_group_id" {
   type = string
   default = ""
 }
+
+variable "fluentd_security_group" {
+  description = "Fluentd security group configuration"
+  type        = object({
+    id   = string
+    port = number
+  })
+  default = {
+    id   = ""
+    port = 0
+  }
+}

@@ -132,3 +132,33 @@ resource "openstack_networking_secgroup_rule_v2" "bastion_external_icmp_access" 
   remote_ip_prefix  = "0.0.0.0/0"
   security_group_id = openstack_networking_secgroup_v2.mongodb_bastion.id
 }
+
+//Grant the mongodb replicaset access to the fluentd port and icmp on a fluentd node
+resource "openstack_networking_secgroup_rule_v2" "mongodb_tcp_access_fluentd" {
+  count             = var.fluentd_security_group.id != "" ? 1 : 0
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = var.fluentd_security_group.port
+  port_range_max    = var.fluentd_security_group.port
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
+  security_group_id = var.fluentd_security_group.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "mongodb_icmp_access_v4" {
+  count             = var.fluentd_security_group.id != "" ? 1 : 0
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "icmp"
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
+  security_group_id = var.fluentd_security_group.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "mongodb_icmp_access_v6" {
+  count             = var.fluentd_security_group.id != "" ? 1 : 0
+  direction         = "ingress"
+  ethertype         = "IPv6"
+  protocol          = "ipv6-icmp"
+  remote_group_id   = openstack_networking_secgroup_v2.mongodb_replicaset_member.id
+  security_group_id = var.fluentd_security_group.id
+}

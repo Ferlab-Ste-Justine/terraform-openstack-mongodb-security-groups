@@ -24,6 +24,10 @@ The module takes the following variables as input:
     ```
 - **bastion_security_group_id**: Id of pre-existing security group to add bastion rules to (defaults to "")
 
+- **fluentd_security_group**: Optional fluentd security group configuration. It has the following keys:
+  - **id**: Id of pre-existing security group to add fluentd rules to
+  - **port**: Port the remote fluentd node listens on
+
 ## Output
 
 The module outputs the following variables as output:
